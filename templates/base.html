@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <title>BurmalDota2 — Кейсы Dota 2</title>
+    <link href="https://jsdelivr.net" rel="stylesheet">
+    <style>
+        body { background-color: #12141a; color: #e4e6eb; }
+        .rarity-Common { border-bottom: 4px solid #b0c3d9; }
+        .rarity-Rare { border-bottom: 4px solid #4b69ff; }
+        .rarity-Immortal { border-bottom: 4px solid #e4ae39; }
+        .rarity-Arcana { border-bottom: 4px solid #ade55c; }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary mb-4">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-warning" href="/">BURMALDOTA 2</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="/">Кейсы</a></li>
+                {% if user.is_authenticated %}
+                <li class="nav-item"><a class="nav-link" href="/inventory/">Инвентарь & Контракты</a></li>
+                {% endif %}
+            </ul>
+            <div class="d-flex align-items-center gap-3">
+                {% if user.is_authenticated %}
+                    <span class="badge bg-success fs-6" id="navBalance">Баланс: {{ user.balance }} ₽</span>
+                    <a href="/billing/topup/" class="btn btn-warning btn-sm fw-bold">+ Пополнить</a>
+                    <a href="/billing/logout/" class="btn btn-outline-light btn-sm">Выйти ({{ user.username }})</a>
+                {% else %}
+                    <a href="/billing/login/" class="btn btn-outline-light btn-sm">Войти</a>
+                    <a href="/billing/register/" class="btn btn-warning btn-sm">Регистрация</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
+</body>
+</html>
