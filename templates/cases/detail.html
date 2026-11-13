@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="text-center mb-4">
+    <h2>{{ case.name }}</h2>
+    <p class="text-secondary">{{ case.description }}</p>
+    <img src="{{ case.image_url }}" width="200" class="mb-3"><br>
+    {% if user.is_authenticated %}
+        <button id="openBtn" class="btn btn-warning btn-lg fw-bold">Открыть за {{ case.price }} ₽</button>
+    {% else %}
+        <a href="/billing/login/" class="btn btn-outline-warning">Войдите, чтобы открыть кейс</a>
+    {% endif %}
+    <div id="resultBox" class="mt-4 d-none">
+        <div class="card bg-dark border-warning mx-auto" style="width: 18rem;">
+            <img id="wonImg" src="" class="card-img-top p-3">
+            <div class="card-body">
+                <h5 id="wonName" class="card-title text-warning"></h5>
+                <p id="wonHero" class="card-text"></p>
+                <a href="/inventory/" class="btn btn-success btn-sm">Перейти в инвентарь</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4>Содержимое кейса и шансы выпадения:</h4>
+<div class="row">
+    {% for item in case.items.all %}
+    <div class="col-md-3 mb-3">
+        <div class="card bg-dark rarity-{{ item.dota_set.rarity }} h-100 text-center p-2">
+            <img src="{{ item.dota_set.image_url }}" class="mx-auto" style="width: 140px;">
+            <div class="card-body">
+                <h6>{{ item.dota_set.name }}</h6>
+                <small class="text-muted">{{ item.dota_set.hero }} | {{ item.dota_set.rarity }}</small><br>
+                <span class="badge bg-secondary mt-2">Шанс: {{ item.drop_chance }}%</span>
+                <div class="text-warning fw-bold mt-1">{{ item.dota_set.price }} ₽</div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+const btn = document.getElementById('openBtn');
+if (btn) {
+    btn.addEventListener('click', function() {
+        this.disabled = true;
+        this.innerText = 'Крутим рулетку...';
+        fetch('/case/{{ case.id }}/open/', {
+            method: 'POST',
+            headers: {'X-CSRFToken': '{{ csrf_token }}'}
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+                this.disabled = false;
+                this.innerText = 'Открыть за {{ case.price }} ₽';
+                return;
+            }
+            setTimeout(() => {
+                document.getElementById('resultBox').classList.remove('d-none');
+                document.getElementById('wonImg').src = data.image_url;
+                document.getElementById('wonName').innerText = data.set_name;
+                document.getElementById('wonHero').innerText = `${data.hero} (${data.rarity}) — ${data.price} ₽`;
+                document.getElementById('navBalance').innerText = `Баланс: ${data.new_balance} ₽`;
+                this.disabled = false;
+                this.innerText = 'Открыть еще раз за {{ case.price }} ₽';
+            }, 1000);
+        });
+    });
+}
+</script>
+{% endblock %}
