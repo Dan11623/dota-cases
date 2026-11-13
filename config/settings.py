@@ -83,7 +83,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'dota_cases_db',
         'USER': 'postgres',
-        'PASSWORD': '4132',
+        'PASSWORD': '1488',
         'HOST': 'localhost',
         'PORT': '5432',
     }
